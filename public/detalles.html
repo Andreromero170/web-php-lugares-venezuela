@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Detalles del Lugar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-light">
+  <div class="container py-5">
+    <h2 class="mb-4">Detalles del Lugar</h2>
+
+    <form id="formDetalles" class="card p-4 shadow-sm bg-white">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción</label>
+        <textarea class="form-control" id="descripcion" required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="estado" class="form-label">Estado</label>
+        <input type="text" class="form-control" id="estado" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="categoria" class="form-label">Categoría</label>
+        <input type="text" class="form-control" id="categoria" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary ">Actualizar</button>
+      <button type="button" class="btn btn-danger my-2" id="btnEliminar">Eliminar</button>
+      <a href="index.html" class="btn btn-secondary">Volver</a>
+    </form>
+  </div>
+
+  <script>
+    const API = 'http://localhost/lugares-venezuela-axios/modelos/api.php';
+    const params = new URLSearchParams(window.location.search);
+    const nombreLugar = params.get('nombre');
+
+    let lugarId = null;
+
+    const cargarDatos = async () => {
+      try {
+        const res = await axios.get(`${API}?nombre=${encodeURIComponent(nombreLugar)}`);
+        const lugar = Array.isArray(res.data) ? res.data[0] : res.data;
+    
+        lugarId = lugar.id; // ✅ Aquí guardamos el ID
+    
+        document.getElementById('nombre').value = lugar.nombre;
+        document.getElementById('descripcion').value = lugar.descripcion;
+        document.getElementById('estado').value = lugar.estado;
+        document.getElementById('categoria').value = lugar.categoria_nombre;
+      } catch (error) {
+        alert('No se pudo cargar el lugar');
+        console.error(error);
+      }
+    };
+    
+    document.getElementById('formDetalles').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const lugarActualizado = {
+        nombre: document.getElementById('nombre').value,
+        descripcion: document.getElementById('descripcion').value,
+        estado: document.getElementById('estado').value,
+        categoria_nombre: document.getElementById('categoria').value
+      };
+
+      try {
+        await axios.put(API, lugarActualizado);
+        alert('Lugar actualizado correctamente');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert('Error al actualizar');
+        console.error(error);
+      }
+    });
+
+    document.getElementById('btnEliminar').addEventListener('click', async () => {
+      if (confirm('¿Estás seguro de que deseas eliminar este lugar?')) {
+        try {
+          await axios.delete(`${API}?id=${lugarId}`); // ✅ Enviamos el ID ahora
+          alert('Lugar eliminado');
+          window.location.href = 'index.html';
+        } catch (error) {
+          alert('Error al eliminar');
+          console.error(error);
+        }
+      }
+    });
+    
+
+    cargarDatos();
+  </script>
+</body>
+
+</html>

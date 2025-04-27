@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../css/formularios.css">
+  <title>Nuevo Lugar Turístico</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-light">
+  <div class="container py-3">
+
+    <form id="formLugar" class="card p-4 shadow-sm bg-white" enctype="multipart/form-data">
+      <h2 class="mb-4">Añadir Nuevo Lugar Turístico</h2>
+
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción</label>
+        <textarea class="form-control" id="descripcion" required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="estado" class="form-label">Estado</label>
+        <input type="text" class="form-control" id="estado" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="categoria" class="form-label">Categoría</label>
+        <select class="form-control" id="categoria" required>
+          <option value="">Seleccione una categoría</option>
+        </select>
+      </div>
+
+      <!-- Campo para cargar imagen -->
+      <div class="mb-3">
+        <label for="imagen" class="form-label">Imagen del Lugar</label>
+        <input type="file" class="form-control" id="imagen" accept="image/*" required>
+      </div>
+
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="index.html" class="btn btn-secondary">Volver</a>
+    </form>
+
+    <div class="container-image">
+      <img src="https://th.bing.com/th/id/OIP.ZPJgN9peFkcHD3XHMIn2_gHaLH?rs=1&pid=ImgDetMain" alt="">
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost/lugares-venezuela-axios/modelos/api.php';
+    const selectCategoria = document.getElementById('categoria');
+
+    // Cargar categorías desde la API
+    const cargarCategorias = async () => {
+      try {
+        const res = await axios.get(`${API}?categorias=true`);
+        const categorias = res.data;
+
+        // Agregar opciones al select
+        categorias.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria.id; // Aquí se usa el id de la categoría
+          option.textContent = categoria.nombre;
+          selectCategoria.appendChild(option);
+        });
+      } catch (error) {
+        alert('Error al cargar las categorías');
+        console.error(error);
+      }
+    };
+
+    // Manejo del formulario
+    document.getElementById('formLugar').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Obtener el archivo de imagen
+      const imagen = document.getElementById('imagen').files[0];
+
+      const formData = new FormData();
+      formData.append('nombre', document.getElementById('nombre').value);
+      formData.append('descripcion', document.getElementById('descripcion').value);
+      formData.append('estado', document.getElementById('estado').value);
+      formData.append('categoria_id', document.getElementById('categoria').value);
+      formData.append('imagen_principal', imagen); // Agregar el archivo de imagen
+
+      try {
+        await axios.post(API, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        alert('Lugar añadido exitosamente');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert('Error al añadir lugar');
+        console.error(error);
+      }
+    });
+
+    // Cargar categorías al cargar la página
+    cargarCategorias();
+  </script>
+</body>
+
+</html>

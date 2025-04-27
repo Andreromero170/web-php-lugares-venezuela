@@ -1,0 +1,33 @@
+.container {
+    height:685px;
+    width: 810px;
+    display: flex;
+    justify-content: center;
+  
+}
+
+.container form {
+    width: 500px;
+}
+
+.container form button {
+    margin-bottom: 5px;
+}
+
+.container form button {
+    background-color: rgb(23, 96, 241);
+    color: white;
+    border: none;
+}
+
+.container form a {
+    background-color: rgb(248, 184, 7);
+    color: rgb(154, 11, 11);
+    border: none;
+}
+
+.container .container-image img {
+    object-fit: contain;
+    height: 100%;
+    width: 100%; /* Si quieres que se adapte al ancho del contenedor */
+}
